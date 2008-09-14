@@ -6,11 +6,17 @@ A plugin for the Merb framework that provides an automatic form generation.
 How to use?
 ===========
 
-1. dependency ""merb-simple-forms" in your config/init.rb
+1. install merb-simple-forms
 
-2. add include Merb::Helpers::SimpleFormsHelpers to app/controllers/application.rb
+git clone git://github.com/maxime/merb-simple-forms.git
+cd merb-simple-forms
+sudo rake install
 
-3. add the form definition to your model:
+2. dependency ""merb-simple-forms" in your config/init.rb
+
+3. add include Merb::Helpers::SimpleFormsHelpers to app/controllers/application.rb
+
+4. add the form definition to your model:
 
 def self.form_definition
   {:attributes =>  [
@@ -20,11 +26,11 @@ def self.form_definition
       ]}
 end
 
-4. use the render_form for rendering your form:
+5. use the render_form for rendering your form:
 
 <%= render_form :user %>
 
-5. you're done!
+6. you're done!
 
 
 TODO
