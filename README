@@ -2,3 +2,34 @@ merb-simple-forms
 =================
 
 A plugin for the Merb framework that provides an automatic form generation.
+
+How to use?
+===========
+
+1. dependency ""merb-simple-forms" in your config/init.rb
+
+2. add include Merb::Helpers::SimpleFormsHelpers to app/controllers/application.rb
+
+3. add the form definition to your model:
+
+def self.form_definition
+  {:attributes =>  [
+      {:email => {:control => :text_field}},
+      {:password => {:control => :password_field}},
+      {:password_confirmation => {:control => :password_field, :label => "Please confirm your password"}}
+      ]}
+end
+
+4. use the render_form for rendering your form:
+
+<%= render_form :user %>
+
+5. you're done!
+
+
+TODO
+====
+
+- write specs
+- clean up some code
+- add documentation
