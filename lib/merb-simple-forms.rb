@@ -10,6 +10,4 @@ if defined?(Merb::Plugins)
   Merb::BootLoader.after_app_loads do
     # code that can be required after the application loads
   end
-  
-  Merb::Plugins.add_rakefiles "merb-simple-forms/merbtasks"
 end
