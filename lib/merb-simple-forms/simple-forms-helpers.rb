@@ -107,7 +107,7 @@ module Merb
           when :file_field, :file
             html = file_field(basic_attributes)
           when :select
-            html = select(basic_attributes.update(:collection => values[:collection]))
+            html = select(basic_attributes.update(:collection => values[:collection], :selected => value))
           else
             html = "unknown control #{values[:control].inspect}"
         end
