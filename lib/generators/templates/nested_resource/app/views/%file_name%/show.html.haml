@@ -1,0 +1,16 @@
+%h1
+  = link_to "<%= human_parent_name.pluralize %>", url(:<%= plural_parent %>)
+  \/
+  = link_to "<%= human_parent_name %> id: #{@<%= parent %>.id}", resource(@<%= parent %>)
+  \/
+  = link_to "<%= plural_human_name %>", url(:<%= parent %>_<%= plural_name %>, @<%= parent %>)
+  \/
+  <%= human_name %>
+
+%p= link_to 'Edit',  url(:edit_<%= parent %>_<%= name %>, @<%= name %>.<%= parent %>, @<%= name %>)
+
+<% attributes.each_pair do |key, value| %>
+%p#<%= key %>
+  <%= Extlib::Inflection.humanize(key) %>:
+  =h @<%= name %>.<%= key %>
+<% end -%>

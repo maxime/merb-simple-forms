@@ -41,6 +41,8 @@ module Merb
           text_area(options[:value], options)
         end
         
+        alias_method :control_textarea, :control_text_area
+        
         def control_password_field(options={})
           password_field(options)
         end
@@ -60,6 +62,25 @@ module Merb
         
         # Controls a computer size in bytes, KB, MB, GB and TB
         def control_size(options={})
+          # Here is the javascript that does the conversion
+          javascript_lib = <<JS
+          <script type="text/javascript" charset="utf-8">
+          function initialize_size_field(id) {
+            $("#"+id+"_converted").bind('change', function() { update_size_field_value(id) });
+            $("#"+id+"_unit").bind('change', function() { update_size_field_value(id) });
+          }
+
+          function update_size_field_value(id) {
+            var converted_value = $("#"+id+"_converted").val();
+            var unit = $("#"+id+"_unit").val();
+            var hidden_field = $("#"+id);
+            if (unit=="B") { hidden_field.val(converted_value); }
+            if (unit=="KB") { hidden_field.val(converted_value * 1024); }
+            if (unit=="MB") { hidden_field.val(converted_value * 1024 * 1024); }
+            if (unit=="GB") { hidden_field.val(converted_value * 1024 * 1024 * 1024); }
+            if (unit=="TB") { hidden_field.val(converted_value * 1024 * 1024 * 1024 * 1024); }  
+          </script>
+JS
           html = ""
           if options[:value] != nil
             size = Kernel.Float(options[:value])
@@ -79,8 +100,63 @@ module Merb
           html << select(:id => options[:id]+"_unit", :name => options[:name]+"[unit]", :collection => [["B", "B"], ["KB", "KB"], ["MB", "MB"], ["GB", "GB"], ["TB", "TB"]], :selected => unit)
           html << hidden_field(options)
           # This javascript looks at the _converted text field and unit select and updates the real value in the hidden field 
-          html << "<script type=\"text/javascript\" charset=\"utf-8\">$(document).ready(function(){initialize_size_field('#{options[:id]}');});</script>"
+          html << javascript_lib
+          html << document_ready("initialize_size_field('#{options[:id]}');")
           html
+        end
+        
+        def control_date_picker(options={})
+          # format the date for the date picker (dm does the conversion in the other way just fine)
+          options[:value] = options[:value].strftime("%m/%d/%Y") if options[:value].class == Time
+          
+          html = text_field(options)
+          html << document_ready("$('##{options[:id]}').datepicker();")
+          html
+        end
+        
+        alias_method :control_date, :control_date_picker
+        alias_method :control_date_selector, :control_date_picker        
+      
+        def control_time_picker(options={})
+          # format the time for the date picker (dm does the conversion in the other way just fine)
+          options[:value] = options[:value].strftime("%I:%M%p").downcase if options[:value].class == Time
+          
+          html = text_field(options)
+          html << document_ready("$('##{options[:id]}').timepicker();")
+          html          
+        end
+        
+        alias_method :control_time, :control_time_picker
+        alias_method :control_time_selector, :control_time_picker        
+      
+        def control_date_and_time(options={})
+          date_picker = control_date_picker(options.merge(:id => options[:id]+"_date", :name => nil))
+          time_picker = control_time_picker(options.merge(:id => options[:id]+"_time", :name => nil))
+          hidden_field = hidden_field(options)
+          
+          javascript = <<JAVASCRIPT
+            function update_date_and_time(id) {
+              console.log("update date and time id: "+id);
+              console.log("date is "+$("#"+id+"_date").val());
+              console.log("time is "+$("#"+id+"_time").val());
+              $("#"+id).val($("#"+id+"_date").val() + " " + $("#"+id+"_time").val());
+            }
+            
+            $("##{options[:id]}_date").bind('change', function() { update_date_and_time('#{options[:id]}') });
+            $("##{options[:id]}_time").bind('change', function() { update_date_and_time('#{options[:id]}') });
+            $("#h_#{options[:id]}_time").bind('change', function() { update_date_and_time('#{options[:id]}') });
+            $("#m_#{options[:id]}_time").bind('change', function() { update_date_and_time('#{options[:id]}') });
+            $("#p_#{options[:id]}_time").bind('change', function() { update_date_and_time('#{options[:id]}') });
+JAVASCRIPT
+          
+          date_picker + time_picker + hidden_field + document_ready(javascript)
+        end
+        
+        alias_method :control_date_and_time_picker, :control_date_and_time
+        alias_method :control_date_and_time_selector, :control_date_and_time
+      
+        def document_ready(script)
+          "<script type=\"text/javascript\" charset=\"utf-8\">$(document).ready(function(){ #{script} } );</script>"
         end
       end
     end

@@ -1,0 +1,27 @@
+%h1
+  = link_to '<%= human_parent_name.pluralize %>', url(:<%= plural_parent_name %>)
+  \/
+  = link_to "<%= human_parent_name %> id: #{@<%= parent %>.id}", resource(@<%= parent %>)
+  \/
+  <%= plural_human_name %>
+
+- if @<%= plural_name %>.size > 0 
+  %table
+    %tr
+<% attributes.each_pair do |key, value| -%>
+      %th <%= Extlib::Inflection.humanize(key) %>
+<% end -%>
+    - for <%= name %> in @<%= plural_name %>
+      %tr{:id => "<%= name %>_#{<%= name %>.id}"}
+<% attributes.each_pair do |key, value| -%>
+        %td.<%= key %>=h <%= name %>.<%= key %>
+<% end -%>
+        %td
+          = link_to 'Show', url(:<%= parent %>_<%= name%>, <%= name %>.<%= parent %>, <%= name %>)
+          = link_to 'Edit', url(:edit_<%= parent %>_<%= name %>,  <%= name %>.<%= parent %>, <%= name %>)
+
+  = link_to 'New', url(:new_<%= parent %>_<%= name %>, @<%= parent %>)
+- else
+  %p
+    No <%= human_name.downcase %> yet for this <%= human_parent_name.downcase %>, 
+    = link_to 'create one?', url(:new_<%= parent %>_<%= name %>, @<%= parent %>)

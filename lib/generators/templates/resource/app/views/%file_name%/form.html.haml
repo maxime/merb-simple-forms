@@ -1,0 +1,9 @@
+%h1
+  = link_to "<%= plural_human_name %>", url(:<%= plural_name %>)
+  - unless @<%= name %>.new_record?
+    \/
+    = link_to "<%= human_name %> id: #{@<%= name %>.id}", url(:<%= name %>, @<%= name %>)
+  \/
+  = @<%= name %>.new_record? ? "Create" : "Edit"
+
+= render_form :<%= name %>

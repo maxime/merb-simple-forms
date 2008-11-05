@@ -1,0 +1,10 @@
+%h1
+  = link_to '<%= human_parent_name.pluralize %>', url(:<%= plural_parent_name %>)
+  \/
+  = link_to "<%= human_parent_name %> id: #{@<%= parent %>.id}", resource(@<%= parent %>)
+  \/
+  = link_to "<%= plural_human_name %>", url(:<%= parent %>_<%= plural_name %>, @<%= parent %>)
+  \/
+  = @<%= name %>.new_record? ? "Create" : "Edit"
+
+= render_form :<%= name %>

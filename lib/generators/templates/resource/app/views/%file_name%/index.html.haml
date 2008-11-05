@@ -1,0 +1,22 @@
+%h1 <%= plural_human_name %>
+
+- if @<%= plural_name %>.size > 0 
+  %table
+    %tr
+<% attributes.each_pair do |key, value| -%>
+      %th <%= Extlib::Inflection.humanize(key) %>
+<% end -%>
+    - for <%= name %> in @<%= plural_name %>
+      %tr{:id => "<%= name %>_#{<%= name %>.id}"}
+<% attributes.each_pair do |key, value| -%>
+        %td.<%= key %>=h <%= name %>.<%= key %>
+<% end -%>
+        %td
+          = link_to 'Show', url(:<%= name %>, <%= name %>)
+          = link_to 'Edit', url(:edit_<%= name %>, <%= name %>)
+          = link 'Delete', :to => url(:<%= name %>, <%= name %>), :method => :delete, :confirm => "Are you sure?"
+  %p= link_to 'New', url(:new_<%= name %>)
+- else
+  %p
+    No <%= human_name.downcase %> yet, 
+    = link_to 'create one?', url(:new_<%= name %>)

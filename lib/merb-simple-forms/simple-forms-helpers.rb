@@ -9,8 +9,12 @@ module Merb
       def render_form(object_symbol, form_definition={})
         object = (object_symbol==nil) ? nil : self.instance_variable_get("@#{object_symbol.to_s}")
 
-        if ((form_definition=={}) and (object!=nil))
-          form_definition = object.class.form_definition
+        if (form_definition=={})
+          if (object!=nil) and object.class.respond_to?(:form_definition)
+            form_definition = object.class.form_definition
+          else
+            form_definition = self.send(object_symbol.to_s+"_form_definition")
+          end
         end
 
         form = "\n"
