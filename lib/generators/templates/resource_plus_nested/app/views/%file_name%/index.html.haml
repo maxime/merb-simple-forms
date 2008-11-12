@@ -1,0 +1,49 @@
+%h1
+  - if <%= parent_instance_variable_name %>
+    = link_to <%= parent_instance_variable_name %>.class.identify.pluralize, url(Extlib::Inflection.underscore(<%= parent_instance_variable_name %>.class.to_s).pluralize.intern)
+    \/
+    = link_to <%= parent_instance_variable_name %>.identify, resource(<%= parent_instance_variable_name %>)
+    \/
+  <%= plural_human_name %>
+
+- if @<%= plural_name %>.size > 0 
+  %table
+    %tr
+<% attributes.each_pair do |key, value| -%>
+      %th <%= Extlib::Inflection.humanize(key) %>
+<% end -%>
+      - unless <%= parent_instance_variable_name %>
+<% parents.each do |parent| -%>
+        %th <%= human_parent_name parent %>
+<% end -%>
+      %th
+    - for <%= name %> in @<%= plural_name %>
+      %tr{:id => "<%= name %>_#{<%= name %>.id}"}
+<% attributes.each_pair do |key, value| -%>
+<% if attributes.keys.first == key -%>
+        %td
+          %strong= link <%= name %>.<%= key %>, :to => (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, <%= name %>) : resource(<%= name %>))
+<% else -%>
+        %td.<%= key %>=h <%= name %>.<%= key %>
+<% end -%>
+<% end -%>
+        - unless <%= parent_instance_variable_name %>
+          / Why there is a clone here? to force the association proxy to give me the real object
+<% parents.each do |parent| -%>
+          %td= link <%= name %>.<%= parent %>.identify, :to => resource(<%= name %>.<%= parent %>.clone) if <%= name %>.<%= parent %> 
+<% end -%>
+        %td
+          = link 'Edit', :to => (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, <%= name %>, :edit) : resource(<%= name %>, :edit)), :class => 'edit action'
+          = link 'Delete', :to => (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, <%= name %>) : resource(<%= name %>)), :method => 'delete', :confirm => 'Are you sure?', :class => 'delete action'
+
+  %p= link_to 'New', (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, :<%= plural_name %>, :new) : url(:new_<%= name %>)), :class => 'new action'
+- else
+  %p
+    %span<>
+      No <%= human_name.downcase %> yet
+    - if <%= parent_instance_variable_name %>
+      &nbsp;
+      %span<>
+        for this <%= human_parent_name.downcase %>
+    ,
+    = link_to 'create one?', (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, :<%= plural_name %>, :new) : url(:new_<%= name %>))

@@ -1,0 +1,14 @@
+%h1
+  - if <%= parent_instance_variable_name %>
+    = link_to <%= parent_instance_variable_name %>.class.identify.pluralize, url(Extlib::Inflection.underscore(<%= parent_instance_variable_name %>.class.to_s).pluralize.intern)
+    \/
+    = link_to <%= parent_instance_variable_name %>.identify, resource(<%= parent_instance_variable_name %>)
+    \/
+  = link_to "<%= plural_human_name %>", (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, :<%= plural_name %>) : url(:<%= plural_name %>))
+  - unless @<%= name %>.new_record?
+    \/
+    = link @<%= name %>.identify, :to => resource(<%= parent_instance_variable_name %>, @<%= name %>)
+  \/
+  = @<%= name %>.new_record? ? "Create" : "Edit"
+
+= render_form :<%= name %>, <%= name %>_form_definition.merge(:nested_within => (<%= parent_instance_variable_name %> ? Extlib::Inflection.underscore(<%= parent_instance_variable_name %>.class.to_s).intern : nil))

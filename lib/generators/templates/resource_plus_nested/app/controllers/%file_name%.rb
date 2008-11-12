@@ -7,12 +7,12 @@ class <%= controller_name %> < Application
   # provides :xml, :yaml, :js
 
   def index
-    @<%= plural_name %> = <%= parent_instance_variable_name %>.<%= plural_name %>
+    @<%= plural_name %> = (<%= parent_instance_variable_name %> ? <%= parent_instance_variable_name %>.<%= plural_name %> : <%= class_name %>.all)
     display @<%= plural_name %>
   end
 
   def show(id)
-    @<%= name %> = <%= parent_instance_variable_name %>.<%= plural_name %>.get(id)
+    @<%= name %> = (<%= parent_instance_variable_name %> ? <%= parent_instance_variable_name %>.<%= plural_name %>.get(id) : <%= class_name %>.get(id))
     raise NotFound unless @<%= name %>
     display @<%= name %>
   end
@@ -25,7 +25,7 @@ class <%= controller_name %> < Application
 
   def edit(id)
     only_provides :html
-    @<%= name %> = <%= parent_instance_variable_name %>.<%= plural_name %>.get(id)
+    @<%= name %> = (<%= parent_instance_variable_name %> ? <%= parent_instance_variable_name %>.<%= plural_name %>.get(id) : <%= class_name %>.get(id))
     raise NotFound unless @<%= name %>
     display @<%= name %>, :form
   end
@@ -40,7 +40,7 @@ class <%= controller_name %> < Application
 <% end -%>
 <% end -%>
     if @<%= name %>.save
-      redirect resource(<%= parent_instance_variable_name %>, @<%= name %>), :message => {:notice => "<%= human_name %> was successfully created"}
+      redirect (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, @<%= name %>) : resource(@<%= name %>)), :message => {:notice => "<%= human_name %> was successfully created"}
     else
       message[:error] = "<%= human_name %> failed to be created"
       display @<%= name %>, :form
@@ -48,20 +48,20 @@ class <%= controller_name %> < Application
   end
 
   def update(id, <%= name %>)
-    @<%= name %> = <%= parent_instance_variable_name %>.<%= plural_name %>.get(id)
+    @<%= name %> = (<%= parent_instance_variable_name %> ? <%= parent_instance_variable_name %>.<%= plural_name %>.get(id) : <%= class_name %>.get(id))
     raise NotFound unless @<%= name %>
     if @<%= name %>.update_attributes(<%= name %>)
-      redirect resource(<%= parent_instance_variable_name %>, @<%= name %>)
+      redirect (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, @<%= name %>) : resource(@<%= name %>))
     else
       display @<%= name %>, :form
     end
   end
 
   def destroy(id)
-    @<%= name %> = <%= parent_instance_variable_name %>.<%= plural_name %>.get(id)
+    @<%= name %> = (<%= parent_instance_variable_name %> ? <%= parent_instance_variable_name %>.<%= plural_name %>.get(id) : <%= class_name %>.get(id))
     raise NotFound unless @<%= name %>
     if @<%= name %>.destroy
-      redirect resource(<%= parent_instance_variable_name %>, :<%= plural_name %>)
+      redirect (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, :<%= plural_name %>) : url(:<%= plural_name %>))
     else
       raise InternalServerError
     end
@@ -72,14 +72,14 @@ class <%= controller_name %> < Application
 <% if single_parent? -%>
   def get_<%= parent %>
     @<%= parent %> = <%= parent_class_name %>.get(params[:<%= parent %>_id])
-    raise NotFound unless @<%= parent %>
+    raise NotFound unless @<%= parent %> || params[:<%= parent %>_id].nil?
   end
 <% else -%>
   def get_parent
 <% parents.each do |parent| -%>
     @parent = <%= classify_name(parent) %>.get(params[:<%= parent %>_id]) if params[:<%= parent %>_id]
 <% end -%>
-    raise NotFound unless @parent
+    raise NotFound unless @parent || (<%= parents.collect{|parent| "params[:#{parent}_id].nil?"}.join(" && ") %>)
   end
 <% end -%>
 end # <%= controller_name %>

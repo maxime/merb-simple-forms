@@ -93,8 +93,10 @@ module Merb::Generators
       to_inject = "resources :#{plural_resource}"
       if File.exist?(router_path)
         content = File.read(router_path)
+        routes = content.gsub(/\A.*^\s*Merb::Router.prepare do\s+(.*)\s+end\s*\Z/mi, '\1')
+        routes_without_nested_routes = routes.gsub(/do(.*?)end/mi, '') 
         
-        unless content =~ Regexp.new("^\s*#{to_inject}")
+        if (routes_without_nested_routes =~ Regexp.new("^\s*#{to_inject}")) == nil
           content = content.gsub(/Merb::Router\.prepare\ do(\n[\s\t]*#\ RESTful\ routes)?/mi) do |match|
             "#{match}\n  #{to_inject}"
           end
@@ -102,14 +104,14 @@ module Merb::Generators
           File.open(router_path, 'wb') { |file| file.write(content) }
           
           # successfuly added the route
-          add_message "resources :#{plural_resource} route added to config/router.rb"
+          add_message "+ resources :#{plural_resource} route added to config/router.rb"
         else
           # already found the route
-          add_message "resources :#{plural_resource} route already added to config/router.rb"
+          add_message "  resources :#{plural_resource} route already added to config/router.rb"
         end
       else
         # can't find the router.rb file
-        add_message "you might need to add the '#{to_inject}' route to your router"
+        add_message "! you might need to add the '#{to_inject}' route to your router"
       end
     end
     
@@ -128,14 +130,14 @@ module Merb::Generators
           File.open(router_path, 'wb') { |file| file.write(content) }
           
           # successfuly added the route
-          add_message "#{to_inject} route added to config/router.rb"
+          add_message "+ #{to_inject} route added to config/router.rb"
         else
           # already found the route
-          add_message "#{to_inject} route already added to config/router.rb"
+          add_message "  #{to_inject} route already added to config/router.rb"
         end
       else
         # can't find the router.rb file
-        add_message "/config/router.rb not found - you might need to add '#{to_inject}' manually to your router."
+        add_message "! /config/router.rb not found - you might need to add '#{to_inject}' manually to your router."
       end
     end
     
@@ -157,10 +159,10 @@ RB
 
           File.open(helper_path, 'wb') { |file| file.write(content) }
 
-          add_message "menu_items method added to app/helpers/global_helpers.rb"
+          add_message "+ menu_items method added to app/helpers/global_helpers.rb"
         end
       else
-        add_message "app/helpers/global_helpers.rb not found"
+        add_message "! app/helpers/global_helpers.rb not found"
       end
     end
     
@@ -179,16 +181,16 @@ RB
     
         if tabs.include?("url(:#{plural_name})") && tabs.include?(plural_human_name)
           # the tab has been found, not creating it again
-          add_message "sounds like the tab '#{plural_human_name}' has been already added to the tabs list"
+          add_message "  the tab '#{plural_human_name}' already added to the tabs list"
         else
           # add the tab
           sentinel = /(def\s+menu_items\n\s*\[\n\s*)(.*?)(\n\s*\]\s*\n\s*end)/mi
           content = content.gsub(sentinel, '\1\2' + to_inject+'\3')
           File.open(helper_path, 'wb') { |file| file.write(content) }
-          add_message "tab '#{plural_human_name}' added to the tabs list"
+          add_message "+ tab '#{plural_human_name}' added to the tabs list"
         end
       else
-        add_message "app/helpers/global_helpers.rb not found"
+        add_message "! app/helpers/global_helpers.rb not found"
       end
     end
     
@@ -254,12 +256,12 @@ RB
           
           File.open(model_path, 'wb') { |file| file.write(content) }
           
-          add_message "#{to_inject} added to the #{parent}.rb model"
+          add_message "+ #{to_inject} added to the #{parent}.rb model"
         else
-          add_message "sounds like the associaton #{to_inject} is already defined in #{parent}.rb"
+          add_message "  associaton #{to_inject} already defined in #{parent}.rb"
         end
       else
-        add_message "you might need to add the association #{to_inject} to your #{parent_class_name} model"
+        add_message "! you might need to add the association #{to_inject} to your #{parent_class_name} model"
       end
     end
     
@@ -284,10 +286,10 @@ RB
           sentinel = /^[\s\t]*resources :#{plural_parent}[\s\t]+do/mi
           to_inject = "\n    #{to_inject}"
           
-          block_content = content.gsub(/\A.*\n[\s\t]+resources :toys do(.*?)end.*\Z/mi, '\1')
+          block_content = content.gsub(/\A.*\n[\s\t]+resources :#{plural_parent} do(.*?)end.*\Z/mi, '\1')
           # check whether the route is already defined
           if block_content =~ /^[\s\t]*resources :#{plural_name}/
-            add_message "sounds like the resources :#{plural_name} is already defined into the resources :#{plural_parent} block"
+            add_message "  resources :#{plural_name} already defined into the resources :#{plural_parent} block"
             return
           end
         else
@@ -300,9 +302,9 @@ RB
           "#{match}#{to_inject}"
         end
         File.open(router_path, 'wb') { |file| file.write(content) }
-        add_message "resources :#{plural_name} added to the resources :#{plural_parent} block in config/router.rb"
+        add_message "+ resources :#{plural_name} added to the resources :#{plural_parent} block in config/router.rb"
       else
-        add_message "you might need to add the nested route for this new resource"
+        add_message "! you might need to add the nested route for this new resource"
       end
     end
     

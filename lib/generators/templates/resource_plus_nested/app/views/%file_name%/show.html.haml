@@ -1,0 +1,17 @@
+%h1
+  - if <%= parent_instance_variable_name %>
+    = link_to <%= parent_instance_variable_name %>.class.identify.pluralize, url(Extlib::Inflection.underscore(<%= parent_instance_variable_name %>.class.to_s).pluralize.intern)
+    \/
+    = link_to <%= parent_instance_variable_name %>.identify, resource(<%= parent_instance_variable_name %>)
+    \/
+  = link_to "<%= plural_human_name %>", (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, :<%= plural_name %>) : url(:<%= plural_name %>))
+  \/
+  = @<%= name %>.<%= identifier %>
+
+%p= link 'Edit', :to => (<%= parent_instance_variable_name %> ? resource(<%= parent_instance_variable_name %>, @<%= name %>, :edit) : resource(@<%= name %>, :edit)), :class => 'edit action'
+
+<% attributes.each_pair do |key, value| %>
+%p#<%= key %>
+  %strong <%= Extlib::Inflection.humanize(key) %>
+  =h @<%= name %>.<%= key %>
+<% end -%>
