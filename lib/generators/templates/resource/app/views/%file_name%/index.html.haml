@@ -6,16 +6,21 @@
 <% attributes.each_pair do |key, value| -%>
       %th <%= Extlib::Inflection.humanize(key) %>
 <% end -%>
+      %th
     - for <%= name %> in @<%= plural_name %>
-      %tr{:id => "<%= name %>_#{<%= name %>.id}"}
+      %tr{:id => "<%= name %>_#{<%= name %>.id}", :class => cycle('odd', 'even')}
 <% attributes.each_pair do |key, value| -%>
+<% if attributes.keys.first == key -%>
+        %td.<%= key %>
+          %strong= link <%= name %>.<%= key %>, :to => url(:<%= name %>, <%= name %>)
+<% else -%>
         %td.<%= key %>=h <%= name %>.<%= key %>
 <% end -%>
+<% end -%>
         %td
-          = link_to 'Show', url(:<%= name %>, <%= name %>)
-          = link_to 'Edit', url(:edit_<%= name %>, <%= name %>)
-          = link 'Delete', :to => url(:<%= name %>, <%= name %>), :method => :delete, :confirm => "Are you sure?"
-  %p= link_to 'New', url(:new_<%= name %>)
+          = link 'Edit', :to => url(:edit_<%= name %>, <%= name %>), :class => 'edit action'
+          = link 'Delete', :to => url(:<%= name %>, <%= name %>), :method => :delete, :confirm => "Are you sure?", :class => 'delete action'
+  %p= link_to 'New', url(:new_<%= name %>), :class => 'new action'
 - else
   %p
     No <%= human_name.downcase %> yet, 

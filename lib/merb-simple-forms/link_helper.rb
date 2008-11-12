@@ -33,3 +33,5 @@ module Merb
     end
   end
 end
+
+Merb::Controller.send(:include, Merb::Helpers::LinkHelper)

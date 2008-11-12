@@ -1,4 +1,9 @@
 scope 'merb-gen' do
   Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_resource')
-  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_nested_resource')  
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_nested_resource') 
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_resource_plus_nested')    
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_javascripts')
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_stylesheet')
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_layout')  
+  Merb.add_generators File.join(File.dirname(__FILE__), 'lib', 'generators', 'hao_de_homepage')    
 end

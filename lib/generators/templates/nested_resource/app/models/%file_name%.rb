@@ -6,5 +6,7 @@ class <%= class_name %>
   property :<%= key %>, <%= value %>
 <% end -%>
 
+<% parents.each do |parent| -%>
   belongs_to :<%= parent %>
+<% end -%>
 end

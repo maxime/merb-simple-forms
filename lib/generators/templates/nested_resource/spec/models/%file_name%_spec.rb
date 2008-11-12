@@ -10,12 +10,14 @@ describe <%= class_name %> do
       @<%= name %>.attributes.keys.should include(column)
     end
   end
-  
-  it "should have a belongs_to association with <%= human_parent_name %>" do
+
+<% parents.each do |parent| -%>
+  it "should have a belongs_to association with <%= human_parent_name(parent) %>" do
     <%= class_name %>.relationships.should be_has_key(:<%= parent %>)
-    <%= class_name %>.relationships[:<%= parent %>].parent_model.should == <%= parent_class_name %>
+    <%= class_name %>.relationships[:<%= parent %>].parent_model.should == <%= parent_class_name(parent) %>
   end
-  
+
+<% end -%>  
   it "should have more specs"
   
   # Validation specs

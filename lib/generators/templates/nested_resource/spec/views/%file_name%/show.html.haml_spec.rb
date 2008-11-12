@@ -1,14 +1,15 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe "<%= plural_name %>/show" do
+<% parents.each do |parent| -%>
+describe "<%= plural_name %>/show, <%= parent %> as parent" do
   before(:each) do                    
     @controller = <%= controller_name %>.new(fake_request)
-    @<%= parent %> = <%= parent_class_name %>.new(:id => 1)
+    <%= parent_instance_variable_name %> = <%= parent_class_name %>.new(:id => 1)
     @<%= name %> = <%= class_name %>.new(<%= generate_attributes %>)
-    @<%= name %>.stub!(:<%= parent %>).and_return(@<%= parent %>)
+    @<%= name %>.stub!(:<%= parent %>).and_return(<%= parent_instance_variable_name %>)
     
     @controller.instance_variable_set(:@<%= name %>, @<%= name %>)
-    @controller.instance_variable_set(:@<%= parent %>, @<%= parent %>)
+    @controller.instance_variable_set(:<%= parent_instance_variable_name %>, <%= parent_instance_variable_name %>)
     
     @body = @controller.render(:show) 
   end
@@ -24,3 +25,5 @@ describe "<%= plural_name %>/show" do
   end
 <% end -%>
 end
+
+<% end -%>

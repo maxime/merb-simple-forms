@@ -1,15 +1,16 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe "<%= plural_name %>/form" do
+<% parents.each do |parent| -%>
+describe "<%= plural_name %>/form, <%= parent %> as parent" do
   before(:each) do                    
     @controller = <%= controller_name %>.new(fake_request)
     
-    @<%= parent %> = <%= parent_class_name %>.new(:id => 1)
+    <%= parent_instance_variable_name %> = <%= parent_class_name(parent) %>.new(:id => 1)
     @<%= name %> = <%= class_name %>.new(<%= generate_attributes %>)
-    @<%= name %>.stub!(:<%= parent %>).and_return(@<%= parent %>)
+    @<%= name %>.stub!(:<%= parent %>).and_return(<%= parent_instance_variable_name %>)
     
     @controller.instance_variable_set(:@<%= name %>, @<%= name %>)
-    @controller.instance_variable_set(:@<%= parent %>, @<%= parent %>)
+    @controller.instance_variable_set(:<%= parent_instance_variable_name %>, <%= parent_instance_variable_name %>)
     
     @body = @controller.render(:form) 
   end
@@ -19,7 +20,7 @@ describe "<%= plural_name %>/form" do
   end
   
   it "should display a form" do
-    @body.should have_tag(:form, :action => '/<%= plural_parent %>/1/<%= plural_name %>')
+    @body.should have_tag(:form, :action => '/<%= parent.pluralize %>/1/<%= plural_name %>')
   end
   
 <% attributes.each_pair do |key, value| -%>
@@ -28,3 +29,5 @@ describe "<%= plural_name %>/form" do
   end
 <% end -%>
 end
+
+<% end -%>

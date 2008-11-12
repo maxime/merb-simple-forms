@@ -38,17 +38,16 @@ module Merb
 
         namespace = form_definition[:namespace] ? form_definition[:namespace].to_s : nil
         nested_within = form_definition[:nested_within] ? form_definition[:nested_within].to_s : nil
-        parent = self.instance_variable_get("@#{nested_within.singular.to_s}") if nested_within
-        parent_id = parent.respond_to?(:slug) ? parent.slug : parent.id if parent
+        parent = (self.instance_variable_get("@#{nested_within.singular.to_s}") || self.instance_variable_get("@parent")) if nested_within
         
         cancel_url = form_definition[:cancel_url]
         
         if cancel_url.nil? && object_symbol
           if namespace.nil? || namespace.empty?
             if nested_within and parent
-              cancel_url = url("#{nested_within.singular}_#{object_symbol.to_s.pluralize}".intern, "#{nested_within.singular}_id".intern => parent_id)
+              cancel_url = resource(parent, object_symbol.to_s.pluralize.intern)
             else
-              cancel_url = url("#{object_symbol.to_s.pluralize}".intern)
+              cancel_url = url(object_symbol.to_s.pluralize.intern)
             end
           else
             if nested_within and parent
@@ -80,20 +79,20 @@ module Merb
 
       def action(object, nested_within, route_name, namespace, disable_slug)
         if nested_within
-          parent = self.instance_variable_get("@#{nested_within.to_s.singular}")
+          parent = self.instance_variable_get("@#{nested_within.to_s.singular}") || self.instance_variable_get("@parent")
           if object.new_record?
             route_name ||= object.class.storage_name
             if namespace
               url("#{namespace}_#{nested_within.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ( (parent.respond_to?(:slug) && !disable_slug)  ? parent.slug : parent.id))
             else
-              url("#{nested_within.to_s.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ((parent.respond_to?(:slug) && !disable_slug) ? parent.slug : parent.id))
+              resource(parent, route_name.intern)
             end
           else
             route_name ||= object.class.storage_name.singular
             if namespace
               url("#{namespace}_#{nested_within.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ( (parent.respond_to?(:slug) && !disable_slug)  ? parent.slug : parent.id), :id => ( (object.respond_to?(:slug)  && !disable_slug) ? object.slug : object.id))
             else
-              url("#{nested_within.to_s.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ((parent.respond_to?(:slug) && !disable_slug) ? parent.slug : parent.id), :id => ( (object.respond_to?(:slug)  && !disable_slug) ? object.slug : object.id))
+              resource(parent, object)
             end
           end
         else
@@ -117,3 +116,5 @@ module Merb
     end
   end
 end
+
+Merb::Controller.send(:include, Merb::Helpers::SimpleFormsHelpers)

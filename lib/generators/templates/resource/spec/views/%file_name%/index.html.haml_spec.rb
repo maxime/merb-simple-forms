@@ -19,12 +19,8 @@ describe "<%= plural_name %>/index" do
   
   it "should display the different <%= plural_human_name.downcase %>" do
 <% attributes.each_pair do |key, value| %>
-    @body.should have_tag(:tr, :id => "<%= name %>_#{@first_<%= name %>.id}").with_tag(:td, :class => '<%= key %>') do |td|
-      td.should contain(@first_<%= name %>.<%= key %>.to_s)
-    end
-    @body.should have_tag(:tr, :id => "<%= name %>_#{@second_<%= name %>.id}").with_tag(:td, :class => '<%= key %>') do |td|
-      td.should contain(@second_<%= name %>.<%= key %>.to_s)
-    end
+    @body.should have_tag(:tr, :id => "<%= name %>_#{@first_<%= name %>.id}") {|tr| tr.should contain(@first_<%= name %>.<%= key %>.to_s) }
+    @body.should have_tag(:tr, :id => "<%= name %>_#{@second_<%= name %>.id}") {|tr| tr.should contain(@second_<%= name %>.<%= key %>.to_s) }
 <% end -%>
   end
 end

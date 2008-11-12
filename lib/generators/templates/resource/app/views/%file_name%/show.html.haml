@@ -1,12 +1,13 @@
 %h1
   = link_to "<%= plural_human_name %>", url(:<%= plural_name %>)
   \/
-  <%= human_name %>
+  = @<%= name %>.<%= identifier %>
 
-%p= link_to 'Edit',  url(:edit_<%= name %>, @<%= name %>)
+%p= link_to 'Edit',  url(:edit_<%= name %>, @<%= name %>), :class => 'edit action'
 
 <% attributes.each_pair do |key, value| %>
 %p#<%= key %>
-  <%= Extlib::Inflection.humanize(key) %>:
+  %strong
+    <%= Extlib::Inflection.humanize(key) %>
   =h @<%= name %>.<%= key %>
 <% end -%>

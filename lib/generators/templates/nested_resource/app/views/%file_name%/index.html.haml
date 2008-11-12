@@ -1,7 +1,7 @@
 %h1
-  = link_to '<%= human_parent_name.pluralize %>', url(:<%= plural_parent_name %>)
+  = link_to <%= parent_instance_variable_name %>.class.identify.pluralize, url(Extlib::Inflection.underscore(<%= parent_instance_variable_name %>.class.to_s).pluralize.intern)
   \/
-  = link_to "<%= human_parent_name %> id: #{@<%= parent %>.id}", resource(@<%= parent %>)
+  = link_to <%= parent_instance_variable_name %>.identify, resource(<%= parent_instance_variable_name %>)
   \/
   <%= plural_human_name %>
 
@@ -11,17 +11,23 @@
 <% attributes.each_pair do |key, value| -%>
       %th <%= Extlib::Inflection.humanize(key) %>
 <% end -%>
+      %th
     - for <%= name %> in @<%= plural_name %>
       %tr{:id => "<%= name %>_#{<%= name %>.id}"}
 <% attributes.each_pair do |key, value| -%>
+<% if attributes.keys.first == key -%>
+        %td
+          %strong= link <%= name %>.<%= key %>, :to => resource(<%= parent_instance_variable_name %>, <%= name %>)
+<% else %>
         %td.<%= key %>=h <%= name %>.<%= key %>
+<% end %>
 <% end -%>
         %td
-          = link_to 'Show', url(:<%= parent %>_<%= name%>, <%= name %>.<%= parent %>, <%= name %>)
-          = link_to 'Edit', url(:edit_<%= parent %>_<%= name %>,  <%= name %>.<%= parent %>, <%= name %>)
+          = link 'Edit', :to => resource(<%= parent_instance_variable_name %>, <%= name %>, :edit), :class => 'edit action'
+          = link 'Delete', :to => resource(<%= parent_instance_variable_name %>, <%= name %>), :method => 'delete', :confirm => 'Are you sure?', :class => 'delete action'
 
-  = link_to 'New', url(:new_<%= parent %>_<%= name %>, @<%= parent %>)
+  %p= link_to 'New', resource(<%= parent_instance_variable_name %>, :<%= plural_name %>, :new), :class => 'new action'
 - else
   %p
     No <%= human_name.downcase %> yet for this <%= human_parent_name.downcase %>, 
-    = link_to 'create one?', url(:new_<%= parent %>_<%= name %>, @<%= parent %>)
+    = link_to 'create one?', resource(<%= parent_instance_variable_name %>, :<%= plural_name %>, :new)

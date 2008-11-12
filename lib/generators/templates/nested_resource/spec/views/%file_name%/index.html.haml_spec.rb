@@ -1,16 +1,17 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe "<%= plural_name %>/index" do
+<% parents.each do |parent| -%>
+describe "<%= plural_name %>/index, <%= parent %> as parent" do
   before(:each) do                    
     @controller = <%= controller_name %>.new(fake_request)
     
-    @<%= parent %> = <%= parent_class_name %>.new(:id => 1)
-    @controller.instance_variable_set(:@<%= parent %>, @<%= parent %>)
+    <%= parent_instance_variable_name %> = <%= parent_class_name(parent) %>.new(:id => 1)
+    @controller.instance_variable_set(:<%= parent_instance_variable_name %>, <%= parent_instance_variable_name %>)
     
     @first_<%= name %> = <%= class_name %>.new(<%= generate_attributes %>)
-    @first_<%= name %>.stub!(:<%= parent %>).and_return(@<%= parent %>)
+    @first_<%= name %>.stub!(:<%= parent %>).and_return(<%= parent_instance_variable_name %>)
     @second_<%= name %> = <%= class_name %>.new(<%= generate_attributes %>)
-    @second_<%= name %>.stub!(:<%= parent %>).and_return(@<%= parent %>)
+    @second_<%= name %>.stub!(:<%= parent %>).and_return(<%= parent_instance_variable_name %>)
     
     @<%= plural_name %> = [@first_<%= name %>, @second_<%= name %>]
     
@@ -24,12 +25,10 @@ describe "<%= plural_name %>/index" do
   
   it "should display the different <%= plural_human_name.downcase %>" do
 <% attributes.each_pair do |key, value| %>
-    @body.should have_tag(:tr, :id => "<%= name %>_#{@first_<%= name %>.id}").with_tag(:td, :class => '<%= key %>') do |td|
-      td.should contain(@first_<%= name %>.<%= key %>.to_s)
-    end
-    @body.should have_tag(:tr, :id => "<%= name %>_#{@second_<%= name %>.id}").with_tag(:td, :class => '<%= key %>') do |td|
-      td.should contain(@second_<%= name %>.<%= key %>.to_s)
-    end
+    @body.should have_tag(:tr, :id => "<%= name %>_#{@first_<%= name %>.id}") {|tr| tr.should contain(@first_<%= name %>.<%= key %>.to_s) }
+    @body.should have_tag(:tr, :id => "<%= name %>_#{@second_<%= name %>.id}") {|tr| tr.should contain(@second_<%= name %>.<%= key %>.to_s) }
 <% end -%>
   end
 end
+
+<% end -%>

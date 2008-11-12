@@ -19,7 +19,7 @@ describe "<%= plural_name %>/form" do
   
 <% attributes.each_pair do |key, value| -%>
   it "should have a <%= default_control(value) %> field for inputting the <%= key %>" do
-    @body.should have_tag(:input, :type => '<%= default_control(value) %>', :id => '<%= name %>_<%= key %>')
+    @body.should have_tag(<%= default_control_for_spec(value)[0].inspect %>, <%= default_control_for_spec(value)[1] ? (default_control_for_spec(value)[1].inspect[1..-2] + ", ") : '' %>:id => '<%= name %>_<%= key %>')
   end
 <% end -%>
 end

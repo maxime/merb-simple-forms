@@ -136,9 +136,6 @@ JS
           
           javascript = <<JAVASCRIPT
             function update_date_and_time(id) {
-              console.log("update date and time id: "+id);
-              console.log("date is "+$("#"+id+"_date").val());
-              console.log("time is "+$("#"+id+"_time").val());
               $("#"+id).val($("#"+id+"_date").val() + " " + $("#"+id+"_time").val());
             }
             
