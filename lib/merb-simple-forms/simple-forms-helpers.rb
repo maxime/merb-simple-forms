@@ -30,11 +30,15 @@ module Merb
             hash =  h[attribute]
             form << "\n"
             form << render_control(object, object_symbol, attribute, hash)
+            if hash[:explanation]
+              form << "\n"
+              form << tag(:div, hash[:explanation], :class => "explanation")
+            end
           end
         end
 
         submit = "\n"
-        submit << submit((object == nil) ? 'Submit' : (object.new_record? ? "Create" : "Update"))
+        submit << submit(form_definition[:submit] || ((object == nil) ? 'Submit' : (object.new_record? ? "Create" : "Update")))
 
         namespace = form_definition[:namespace] ? form_definition[:namespace].to_s : nil
         nested_within = form_definition[:nested_within] ? form_definition[:nested_within].to_s : nil

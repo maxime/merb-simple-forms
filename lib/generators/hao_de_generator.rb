@@ -34,7 +34,8 @@ module Merb::Generators
                   "Integer" => 'text',
                   "DateTime" => 'date_picker',
                   "Time" => 'date_picker',
-                  "Text" => 'text_area'}
+                  "Text" => 'text_area',
+                  "Float" => 'text'}
       raise "Not Supported type #{type.to_s}" if mapping[type.to_s] == nil
       return mapping[type.to_s]
     end
@@ -44,7 +45,8 @@ module Merb::Generators
                   "Integer" => [:input, {:type => 'text'}],
                   "DateTime" => [:input, {:type => 'text'}],
                   "Time" => [:input, {:type => 'text'}],
-                  "Text" =>  [:textarea]}
+                  "Text" =>  [:textarea],
+                  "Float" => [:input, {:type => 'text'}]}
       raise "Not Supported type #{type.to_s}" if mapping[type.to_s] == nil
       return mapping[type.to_s]
     end

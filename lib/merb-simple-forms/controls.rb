@@ -8,7 +8,7 @@ module Merb
 
           label = values[:label] || humanize_symbol(attribute)
           # check if the object is here and the method is public
-          value = (object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)
+          value = (values[:value] || ((object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)))
           collection = values[:collection]
           
           html = ''
@@ -19,7 +19,6 @@ module Merb
           end
           
           error_message = ""
-
           if object!=nil and object.errors and object.errors.on(attribute) and object.errors.on(attribute).size > 0
             object.errors.on(attribute).each do |error|
               error_message << tag(:div, error)
@@ -28,7 +27,7 @@ module Merb
           end
 
           html = tag(:label, label+":", :for => id) + html
-          tag(:div, html, :class => "row #{values[:control]}") + error_message
+          tag(:div, html, :class => "row #{values[:control]} #{error_message!='' ? 'has_errors' : ''}") + error_message
         end
         
         def control_text_field(options={})
@@ -152,6 +151,19 @@ JAVASCRIPT
         alias_method :control_date_and_time_picker, :control_date_and_time
         alias_method :control_date_and_time_selector, :control_date_and_time
       
+        def control_checkbox(options={})
+          checked = options.delete(:value)
+          html = hidden_field(options.merge(:value => "false"))
+          html << "\n"
+          html << check_box(options.merge(:boolean => false, :checked => checked, :value => "true"))
+          html
+        end
+      
+        alias_method :control_checkbox, :control_checkbox
+        alias_method :control_check_box, :control_checkbox
+        alias_method :control_check, :control_checkbox
+        alias_method :control_boolean, :control_checkbox
+
         def document_ready(script)
           "<script type=\"text/javascript\" charset=\"utf-8\">$(document).ready(function(){ #{script} } );</script>"
         end

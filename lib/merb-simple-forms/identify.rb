@@ -2,11 +2,11 @@ module Merb
   module ModelInstanceIdentify
     def identify
       value = self.send(properties.collect {|p| p.serial? ? nil : p.name }.compact.first)
-      if value == nil or value.empty?
+      if value == nil or (value.respond_to?(:empty?) and value.empty?)
         if new_record?
-          return "new #{Extlib::Inflection.humanize(self.class.to_s)}"
+          return "new #{self.class.identify}"
         else
-          return "#{Extlib::Inflection.humanize(self.class.to_s)} #{(self.respond_to?(:id) && self.id!=nil) ? "id:#{self.id}" : ''}"
+          return "#{self.class.identify} #{(self.respond_to?(:id) && self.id!=nil) ? "id:#{self.id}" : ''}"
         end
       end
       value
@@ -26,10 +26,12 @@ module DataMapper
   end
 end
 
-module DataMapper
-  module Resource
-    module ClassMethods
-      include Merb::ClassIdentify
-    end
+class Class
+  include Merb::ClassIdentify
+end
+
+class String
+  def identify
+    self
   end
 end
