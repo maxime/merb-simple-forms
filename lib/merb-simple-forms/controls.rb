@@ -6,16 +6,20 @@ module Merb
           id = (object_symbol==nil) ? attribute.to_s : "#{object_symbol}_#{attribute}"
           name = (object_symbol==nil) ? attribute.to_s : "#{object_symbol}[#{attribute}]"
 
-          label = values[:label] || humanize_symbol(attribute)
+          label = values.delete(:label) || humanize_symbol(attribute)
           # check if the object is here and the method is public
-          value = (values[:value] || ((object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)))
-          collection = values[:collection]
+          value = (values.delete(:value) || ((object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)))
+          control = values.delete(:control)
           
           html = ''
-          if self.respond_to?("control_#{values[:control]}")
-            html = self.send("control_#{values[:control]}", {:id => id, :name => name, :value => value, :collection => collection})    
+          if self.negative_captcha_form?
+            html = negative_control(control, values.merge({:id => id, :name => name, :value => value}))
           else
-            html = "unknown control #{values[:control].inspect}"
+            if self.respond_to?("control_#{control}")
+              html = self.send("control_#{control}", values.merge({:id => id, :name => name, :value => value}))    
+            else
+              html = "unknown control #{control.inspect}"
+            end
           end
           
           error_message = ""
@@ -129,6 +133,7 @@ JS
         alias_method :control_time_selector, :control_time_picker        
       
         def control_date_and_time(options={})
+          options[:id] ||= "default_#{rand(1000)}"
           date_picker = control_date_picker(options.merge(:id => options[:id]+"_date", :name => nil))
           time_picker = control_time_picker(options.merge(:id => options[:id]+"_time", :name => nil))
           hidden_field = hidden_field(options)
@@ -163,6 +168,22 @@ JAVASCRIPT
         alias_method :control_check_box, :control_checkbox
         alias_method :control_check, :control_checkbox
         alias_method :control_boolean, :control_checkbox
+
+        def control_multiple_checkboxes(options={})
+          html = ''
+          options[:name] = options[:name] + "[]" if options[:name]
+
+          html << hidden_field(options.merge(:value => nil))
+
+          options.delete(:collection).each do |object|
+            html << "<div class='option'>"
+            html << check_box(options.merge(:value => object[0], :checked => options[:value].include?(object[0])))
+            html << " "
+            html << object[1]
+            html << "</div>"
+          end
+          html
+        end
 
         def document_ready(script)
           "<script type=\"text/javascript\" charset=\"utf-8\">$(document).ready(function(){ #{script} } );</script>"

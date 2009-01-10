@@ -3,6 +3,7 @@ if defined?(Merb::Plugins)
   require File.join(File.dirname(__FILE__), "merb-simple-forms", "controls")
   require File.join(File.dirname(__FILE__), "merb-simple-forms", "link_helper")
   require File.join(File.dirname(__FILE__), "merb-simple-forms", "size_helpers")
+  require File.join(File.dirname(__FILE__), "merb-simple-forms", "negative_captcha")
   require File.join(File.dirname(__FILE__), "merb-simple-forms", "simple-forms-helpers")
   require File.join(File.dirname(__FILE__), "merb-simple-forms", "identify")  
 

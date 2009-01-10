@@ -2,6 +2,7 @@ module Merb
   module Helpers
     module SimpleFormsHelpers
       include Merb::Helpers::SimpleFormsHelpers::Controls
+      include Merb::NegativeCaptcha
       def render_basic_form(form_definition)
         render_form(form_definition[:model_name], form_definition)
       end
@@ -16,7 +17,9 @@ module Merb
             form_definition = self.send(object_symbol.to_s+"_form_definition")
           end
         end
-
+        
+        self.negative_captcha_options = form_definition[:negative_captcha] 
+        
         form = "\n"
         method = form_definition[:method] || ((object==nil) ? :post : (object.new_record? ? :post : :put))
         if (method!=:post and method!=:get)
