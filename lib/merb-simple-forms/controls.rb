@@ -6,31 +6,47 @@ module Merb
           id = (object_symbol==nil) ? attribute.to_s : "#{object_symbol}_#{attribute}"
           name = (object_symbol==nil) ? attribute.to_s : "#{object_symbol}[#{attribute}]"
 
-          label = values.delete(:label) || humanize_symbol(attribute)
-          # check if the object is here and the method is public
-          value = (values.delete(:value) || ((object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)))
-          control = values.delete(:control)
-          
-          html = ''
-          if self.negative_captcha_form?
-            html = negative_control(control, values.merge({:id => id, :name => name, :value => value}))
+          if values.keys.include?(:label)
+            label = values.delete(:label)
           else
-            if self.respond_to?("control_#{control}")
-              html = self.send("control_#{control}", values.merge({:id => id, :name => name, :value => value}))    
+            label = humanize_symbol(attribute)
+          end
+          after_text = values.delete(:after) 
+          
+          # check if the object is here and the method is public
+          
+          control = values.delete(:control)
+          html = error_message = ''
+          
+          if (control)
+            value = (values.delete(:value) || ((object==nil) ? nil : (object.public_methods.include?(attribute.to_s) ? object.send(attribute) : nil)))
+          
+            if self.negative_captcha_form?
+              html = negative_control(control, values.merge({:id => id, :name => name, :value => value}))
             else
-              html = "unknown control #{control.inspect}"
+              if self.respond_to?("control_#{control}")
+                html = self.send("control_#{control}", values.merge({:id => id, :name => name, :value => value}))    
+              else
+                html = "unknown control #{control.inspect}"
+              end
+            end
+          
+            if object!=nil and object.errors and object.errors.on(attribute) and object.errors.on(attribute).size > 0
+              object.errors.on(attribute).each do |error|
+                error_message << tag(:div, error)
+              end
+              error_message = tag(:div, error_message, :class => 'errors')
             end
           end
           
-          error_message = ""
-          if object!=nil and object.errors and object.errors.on(attribute) and object.errors.on(attribute).size > 0
-            object.errors.on(attribute).each do |error|
-              error_message << tag(:div, error)
-            end
-            error_message = tag(:div, error_message, :class => 'errors')
+          if label
+            html = tag(:label, label+":", :for => id) + html
           end
-
-          html = tag(:label, label+":", :for => id) + html
+          
+          if after_text
+            html = html + " " + after_text
+          end
+          
           tag(:div, html, :class => "row #{values[:control]} #{error_message!='' ? 'has_errors' : ''}") + error_message
         end
         
@@ -59,7 +75,7 @@ module Merb
         alias_method :control_file, :control_file_field
         
         def control_select(options={})
-          options[:selected] = options.delete(:value)
+          options[:selected] = options.delete(:value).to_s
           select(options)
         end
         

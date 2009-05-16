@@ -52,7 +52,7 @@ module Merb
         if cancel_url.nil? && object_symbol
           if namespace.nil? || namespace.empty?
             if nested_within and parent
-              cancel_url = resource(parent, object_symbol.to_s.pluralize.intern)
+              cancel_url = resource(parent, (form_definition[:route_name] || object_symbol.to_s.pluralize.intern))
             else
               cancel_url = url(object_symbol.to_s.pluralize.intern)
             end
@@ -92,7 +92,7 @@ module Merb
             if namespace
               url("#{namespace}_#{nested_within.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ( (parent.respond_to?(:slug) && !disable_slug)  ? parent.slug : parent.id))
             else
-              resource(parent, route_name.intern)
+              resource(parent, (route_name.class == Symbol ? route_name : route_name.intern))
             end
           else
             route_name ||= object.class.storage_name.singular
