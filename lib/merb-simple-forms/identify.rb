@@ -3,7 +3,7 @@ module Merb
     def identify
       value = self.send(properties.collect {|p| p.serial? ? nil : p.name }.compact.first)
       if value == nil or (value.respond_to?(:empty?) and value.empty?)
-        if new_record?
+        if new?
           return "new #{self.class.identify}"
         else
           return "#{self.class.identify} #{(self.respond_to?(:id) && self.id!=nil) ? "id:#{self.id}" : ''}"

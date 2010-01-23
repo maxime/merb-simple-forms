@@ -21,7 +21,7 @@ module Merb
         self.negative_captcha_options = form_definition[:negative_captcha] 
         
         form = "\n"
-        method = form_definition[:method] || ((object==nil) ? :post : (object.new_record? ? :post : :put))
+        method = form_definition[:method] || ((object==nil) ? :post : (object.new? ? :post : :put))
         if (method!=:post and method!=:get)
           form << hidden_field(:name => '_method', :value => method)
           form << "\n"
@@ -41,7 +41,7 @@ module Merb
         end
 
         submit = "\n"
-        submit << submit(form_definition[:submit] || ((object == nil) ? 'Submit' : (object.new_record? ? "Create" : "Update")))
+        submit << submit(form_definition[:submit] || ((object == nil) ? 'Submit' : (object.new? ? "Create" : "Update")))
 
         namespace = form_definition[:namespace] ? form_definition[:namespace].to_s : nil
         nested_within = form_definition[:nested_within] ? form_definition[:nested_within].to_s : nil
@@ -87,7 +87,7 @@ module Merb
       def action(object, nested_within, route_name, namespace, disable_slug)
         if nested_within
           parent = self.instance_variable_get("@#{nested_within.to_s.singular}") || self.instance_variable_get("@parent")
-          if object.new_record?
+          if object.new?
             route_name ||= object.class.storage_name
             if namespace
               url("#{namespace}_#{nested_within.singular}_#{route_name}".intern, (nested_within.to_s.singularize + "_id").intern => ( (parent.respond_to?(:slug) && !disable_slug)  ? parent.slug : parent.id))
@@ -103,7 +103,7 @@ module Merb
             end
           end
         else
-          if object.new_record?
+          if object.new?
             route_name ||= object.class.storage_name
             if namespace
               url("#{namespace}_#{route_name}".intern)

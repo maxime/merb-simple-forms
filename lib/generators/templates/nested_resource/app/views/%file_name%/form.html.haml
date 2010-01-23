@@ -4,10 +4,10 @@
   = link_to <%= parent_instance_variable_name %>.identify, resource(<%= parent_instance_variable_name %>)
   \/
   = link_to "<%= plural_human_name %>", resource(<%= parent_instance_variable_name %>, :<%= plural_name %>)
-  - unless @<%= name %>.new_record?
+  - unless @<%= name %>.new?
     \/
     = link @<%= name %>.identify, :to => resource(<%= parent_instance_variable_name %>, @<%= name %>)
   \/
-  = @<%= name %>.new_record? ? "Create" : "Edit"
+  = @<%= name %>.new? ? "Create" : "Edit"
 
 = render_form :<%= name %>
